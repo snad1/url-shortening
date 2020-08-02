@@ -1,8 +1,12 @@
 import express from "express"
-import config from "config";
+import config from "../config/default";
 import Url from "../models/url";
 
 const router = express.Router()
+
+router.get('/test', async (req, res) => {
+  res.json({message: 'pass!'})
+})
 
 router.get("/:code", async (req, res) => {
   try {
@@ -20,8 +24,9 @@ router.get("/:code", async (req, res) => {
 })
 
 router.get("/", async (req, res) => {
+  // res.json({message: 'pass!'})
   try {
-    let urls = await Url.find().sort({$natural: -1})
+    let urls = await Url.find().sort({$natural: 1})
     if (!urls) {
       res.status(500).json({error: true, message: "Server error"})
     }
@@ -48,7 +53,7 @@ const generateCode = async (length: number) => {
 
 router.post("/shorten", async (req, res) => {
   const {originalUrl} = req.body
-  const baseURL = config.get("baseURL")
+  const baseURL = config.baseURL
   const code = await generateCode(8)
   try {
     let url = await Url.findOne({originalUrl})

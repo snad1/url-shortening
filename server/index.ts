@@ -1,5 +1,4 @@
 import express from "express"
-import config from "config"
 const connectDB = require("./config/db")
 const cors = require("cors")
 
@@ -8,7 +7,7 @@ const app: express.Application = express()
 connectDB()
 
 const corsOptions = {
-  origin: 'http://localhost:8080',
+  origin: '*',
   methods: [
     'GET',
     'POST',
@@ -27,6 +26,11 @@ app.use(express.urlencoded({extended: false}))
 app.use("/", require("./routes/index.ts"))
 // app.use("/api/shorten", require("./routes/url"))
 
+/*app.get('/test', async (req, res) => {
+  res.json({message: 'pass!'})
+})*/
+
 const POST = 5000
 
-app.listen(POST, () => console.log(`Server running on port ${POST}`))
+// app.listen(POST, () => console.log(`Server running on port ${POST}`))
+module.exports = app.listen(POST, () => console.log(`Server running on port ${POST}`))
