@@ -1,11 +1,21 @@
 import request from "supertest";
-const app = require("../index");
+import app from "../index";
 
 describe("Route test ", () => {
   let code = ''
-  it("All urls", async () => {
-    const res = await request(app).get("/");
+  it("Test", async done => {
+    expect(1).toBe(1)
+    done()
+  });
+  it("Test url", async done => {
+    const res = await request(app).get("/test");
     expect(res.status).toBe(200)
+    done()
+  });
+  it("All urls", async done => {
+    const res = await request(app).get("/");
+    expect(res.status).toBe(200);
+    done()
   });
   it("Add url for shorten", async () => {
     const res = await request(app).post('/shorten').send({ originalUrl: 'https://example.com'});
@@ -16,4 +26,4 @@ describe("Route test ", () => {
     expect(res.status).toBe(200)
   });
 });
-jest.setTimeout(30000)
+jest.setTimeout(10000)

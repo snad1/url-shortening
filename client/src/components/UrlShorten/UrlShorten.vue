@@ -115,12 +115,14 @@
   }
   .form > input{
     width: 80%;
+    height: 30px;
   }
   .form > button{
     background-color: #42b983;
     color: white;
     border-color: transparent;
     border-radius: 2px;
+    height: 40px;
   }
   .container > ul{
     list-style-type: none;

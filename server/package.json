@@ -2,9 +2,9 @@
   "name": "url-shortening-server",
   "version": "1.0.0",
   "main": "index.ts",
-  "type": "module",
   "scripts": {
     "start": "node -r esm index.ts",
+    "start2": "node --experimental-modules index.ts",
     "dev": "nodemon index.ts",
     "test": "jest --detectOpenHandles",
     "tsc": "tsc"
@@ -45,7 +45,7 @@
       }
     },
     "testMatch": [
-      "**/?(*.)(spec|test).+(ts|tsx|js)"
+      "**/?(*.)(spec|test).+(ts)"
     ],
     "testEnvironment": "node"
   }

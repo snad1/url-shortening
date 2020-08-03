@@ -1,11 +1,13 @@
 import mongoose from "mongoose"
+import mongo from "mongodb"
 import config from "../config/default";
 
-const db: any = config.mongoURI
+const db: string = config.mongoURI
 
 const connectDB = async () => {
     try {
         await mongoose.connect(db, {useNewUrlParser: true, useUnifiedTopology: true })
+        // await mongo.MongoClient.connect(db, {useNewUrlParser: true, useUnifiedTopology: true })
         console.log("MongoDB connected...")
     } catch (e) {
         console.log(e.message)
@@ -13,4 +15,4 @@ const connectDB = async () => {
     }
 }
 
-module .exports = connectDB
+export default connectDB

@@ -1,11 +1,12 @@
 import express from "express"
-const connectDB = require("./config/db")
-const cors = require("cors")
+import connectDB from "./config/db"
+// @ts-ignore
+import cors from "cors"
+import config from "./config/default";
+import Url from "./models/url";
 
-const app: express.Application = express()
-
-connectDB()
-
+const app = express();
+const POST = 5000;
 const corsOptions = {
   origin: '*',
   methods: [
@@ -17,20 +18,85 @@ const corsOptions = {
     'Access-Control-Allow-Origin',
     'Access-Control-Allow-Credentials',
   ],
+};
+// @ts-ignore
+const generateCode = async (length) => {
+  let code = "";
+  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+  let charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    code += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  let url = await Url.findOne({code})
+  if (url) {
+    await generateCode(8)
+  }
+  return code;
 }
 
+connectDB();
+
 app.use(cors(corsOptions));
-app.use(express.json())
-app.use(express.urlencoded({extended: false}))
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
-app.use("/", require("./routes/index.ts"))
-// app.use("/api/shorten", require("./routes/url"))
-
-/*app.get('/test', async (req, res) => {
+app.get('/test', async (req, res) => {
   res.json({message: 'pass!'})
-})*/
+})
 
-const POST = 5000
+app.get("/", async (req, res) => {
+  // res.json({message: 'pass!'})
+  try {
+    let urls = await Url.find().sort({$natural: 1})
+    if (!urls) {
+      res.status(500).json({error: true, message: "Server error"})
+    }
+    res.json(urls)
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({error: true, message: "Server error"})
+  }
+})
 
-// app.listen(POST, () => console.log(`Server running on port ${POST}`))
-module.exports = app.listen(POST, () => console.log(`Server running on port ${POST}`))
+app.post("/shorten", async (req, res) => {
+  const {originalUrl} = req.body
+  const baseURL = config.baseURL
+  const code = await generateCode(8)
+  try {
+    let url = await Url.findOne({originalUrl})
+    let nUrl = false
+    if (!url) {
+      const newUrl = baseURL + "/" + code
+      url = new Url({
+        code,
+        originalUrl,
+        newUrl,
+        date: new Date()
+      })
+      await url.save()
+      nUrl = true
+    }
+    res.json({url, nUrl})
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({error: true, message: "Server error"})
+  }
+})
+
+app.get("/:code", async (req, res) => {
+  try {
+    let url = await Url.findOne({code: req.params.code})
+    if (url) {
+      // @ts-ignore
+      res.json(url)
+    } else {
+      res.status(404).json({error: true, message: "No url"})
+    }
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({error: true, message: "Server error"})
+  }
+})
+
+app.listen(POST, () => console.log(`Server running on port ${POST}`));
+export default app
